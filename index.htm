@@ -1,0 +1,102 @@
+<!--
+		RockScissorPaper version 1.0.0
+		SinglePageApplication
+		using Javascript
+		created by leejunghun 2017.Last proj of this year.
+		README
+		인코딩텍스트를 서로 교환
+
+		개인키를 모르기 때문에 디코드 안됨.
+
+		개인키를 줘도 내용을 나의 가위바위보 인코딩텍스트를 이미 줬기 때문에 못바꿈.
+
+		개인키 보내서 교환 완료.
+
+		가위,바위,보 3세판 게임.
+		
+		노서버이기 때문에 해킹도 불가. 
+//-->
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>RockScissorsPaper</title>
+	<style>
+		#text,#ret{
+			color:green;
+		}
+	</style>
+</head>
+<body>
+	<input id=my placeholder="가위,바위,보"></input><input type=number id=pk placeholder="Private Key"></input><button onclick='encode()'>Encoding</button><div id=text></div>
+	<input id=u placeholder="가위,바위,보"></input><input type=number id=upk placeholder="Private Key"></input><button onclick='fight()'>Fighting!!</button><div id=ret></div>
+	<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+	<script>
+		function fight(){
+			var m=$("#my").val();
+			m=m.replace(/ /gi,"");	
+			var u=decode($("#u").val(),$("#upk").val());
+			if(!u)alert("상대방 값을 입력하세요!");
+
+			var ml=m.split(",");
+			var ul=u.split(",");
+			if(ml.length!=3 || ul.length!=3){
+				alert("상대방 또는 자신이 세개를 지정하지 않았습니다.");
+				return;
+			}
+			var uwin=0;
+			var mwin=0;
+			for(var i=0;i<3;i++){
+				var mi=-1,ui=-1;
+				if(ml[i].indexOf("가위")>=0)mi=0;
+				else if(ml[i].indexOf("바위")>=0)mi=1;
+				else if(ml[i].indexOf("보")>=0)mi=2;
+
+				if(ul[i].indexOf("가위")>=0)ui=0;
+				else if(ul[i].indexOf("바위")>=0)ui=1;
+				else if(ul[i].indexOf("보")>=0)ui=2;
+
+				if(mi==-1){alert("자신의 값중에서 가위,바위,보가 아닌 값이 있습니다.");return;}
+				if(ui==-1){alert("상대방 값중에서 가위,바위,보가 아닌 값이 있습니다.");return;}
+
+				if(mi==0 && ui==1)uwin++;
+				else if(mi==0 && ui==2)mwin++;
+				else if(mi==1 && ui==0)mwin++;
+				else if(mi==1 && ui==2)uwin++;
+				else if(mi==2 && ui==0)uwin++;
+				else if(mi==2 && ui==1)mwin++;
+			}
+			u="상대방:"+u+"<br>";
+			if(mwin>uwin)
+				$("#ret").html(u+"내가 이겼다. WIN!!");
+			else if(mwin<uwin)
+				$("#ret").html(u+"내가 졌다... LOSEㅠㅠ");
+			else
+				$("#ret").html(u+"동점이다 다시혀!! AGaIN!");
+		}
+		function encode(){ 
+			var t=$("#my").val();
+			t=t.replace(/ /gi,"");	
+			let k=$("#pk").val();
+			if(t&&k){
+				k=parseInt(k); k*=-1;
+				var et="";
+				for(var i=0;i<t.length;i++){
+					et+=String.fromCharCode(t.charCodeAt(i)+k);
+				}
+				et=encodeURIComponent(et);
+				$("#text").html(et);
+			}
+		}
+		function decode(t,k){
+			if(!t||!k)return;
+			k*=-1;
+			t=decodeURIComponent(t);
+			var et="";
+			for(var i=0;i<t.length;i++){
+				et+=String.fromCharCode(t.charCodeAt(i)-k);
+			}
+			return et;
+		}
+	</script>
+</body>
+</html>
